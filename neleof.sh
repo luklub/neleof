@@ -13,7 +13,10 @@
 # - Sed
 #
 # Changelog:
-# v1.0.0 (2018-06-05) Initial release.
+# v1.1.0 (2018-06-11)
+#   - Added "fix" feature.
+# v1.0.0 (2018-06-05)
+#   - Initial release.
 #
 # Todo:
 # - add ability to fix
@@ -22,6 +25,7 @@
 VERSION="1.0.0"
 SEARCH_PATH="."
 EXCLUDE=""
+FIX_MODE=false
 
 print_help()
 {
@@ -47,6 +51,7 @@ Params:
 -h      Prints this help.
 -v      Prints version.
 -e      Exclude paths (comma separated).
+-f      Fixes the problem.
 [path]  Searches this path. (If omitted, current dir will be used.)
 
 
@@ -84,7 +89,7 @@ For more information, please refer to <http://unlicense.org>
 EOF
 }
 
-while getopts "hve:" OPT; do
+while getopts "hvfe:" OPT; do
     case "$OPT" in
         h )
             print_help
@@ -101,6 +106,10 @@ while getopts "hve:" OPT; do
         \? )
             echo "Invalid Option: -$OPTARG" 1>&2
             exit 1
+            ;;
+        f )
+            FIX_MODE=true
+            echo "Fix mode enabled!"
             ;;
         e )
             EXCLUDE="$OPTARG"
@@ -124,6 +133,15 @@ FILES=$(eval "find $SEARCH_PATH $EXCLUDE -type f -size +0 -exec gawk 'ENDFILE{if
 if [ -n "$FILES" ]; then
     FILES_CNT=$(echo "$FILES" | grep -c '^')
     printf "%s\nFound %s files in \"$SEARCH_PATH\" location.\n" "$FILES" "$FILES_CNT"
+
+    if [ "$FIX_MODE" = true ]; then
+        for file in "$FILES"; do
+            echo "hello" >> file
+        done
+
+        echo "Fixed!"
+    fi
+
     exit 1
 fi
 echo "No files found."
